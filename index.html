@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>bRUSH | The Daily Drawing Challenge</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&family=Nunito:wght@400;600;700&family=Architects+Daughter&family=VT323&family=Caveat:wght@400;700&family=Bangers&family=Permanent+Marker&family=Comic+Neue:wght@400;700;900&family=Finger+Paint&family=Water+Brush&display=swap" rel="stylesheet">
+    
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Tailwind Configuration -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Nunito', 'sans-serif'],
+                        display: ['Montserrat', 'sans-serif'],
+                    },
+                    colors: {
+                        brush: {
+                            orange: '#FF9E3D',
+                            pink: '#FA4784',
+                            yellow: '#FFE040',
+                            textBlue: '#1E2E4C',
+                            bg: '#FDFBF7',
+                            card: '#FFFFFF'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Custom Styles -->
+    <style>
+        /* Base / Default Theme */
+        body {
+            background-color: #FDFBF7;
+            color: #1E2E4C;
+            overflow-x: hidden;
+        }
+
+        .sketch-pattern {
+            background-image: radial-gradient(#1E2E4C 0.5px, transparent 0.5px);
+            background-size: 24px 24px;
+            opacity: 0.05;
+            position: fixed;
+            inset: 0;
+            z-index: -3;
+            pointer-events: none;
+        }
+
+        .mesh-bg {
+            position: fixed;
+            inset: 0;
+            z-index: -2;
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(255, 158, 61, 0.12) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(250, 71, 132, 0.12) 0px, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(255, 224, 64, 0.12) 0px, transparent 50%);
+            pointer-events: none;
+        }
+
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 6px 14px rgba(0, 0, 0, 0.06);
+        }
+
+        .text-gradient {
+            background-color: #FA4784; 
+            background-image: linear-gradient(135deg, #FF9E3D, #FA4784);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .btn-primary {
+            background-color: #FA4784; 
+            background-image: linear-gradient(135deg, #FF9E3D, #FA4784);
+            color: #ffffff !important; 
+            border-radius: 16px;
+            box-shadow: 0 8px 16px rgba(250, 71, 132, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .btn-primary * {
+            color: #ffffff !important;
+        }
+        .btn-primary:hover {
+            transform: scale(0.98) translateY(-2px);
+            box-shadow: 0 12px 20px rgba(250, 71, 132, 0.4);
+        }
+
+        :root {
+            --size: max(3px, 0.82vmin);
+            --height: 80em;
+            --pad: 0.7em;
+            --border-radius: calc(var(--height) * 0.072); 
+            --border-width: 0.32em;
+            --button-width: 0.28em;
+            --notch-height: 3.2em; 
+            --notch-width: 36%;    
+            --notch-radius: 3.5em;
+        }
+
+        @keyframes phoneAppear {
+            to { transform: scale3d(1, 1, 1); opacity: 1; }
+        }
+        @keyframes floatTilt {
+            0%, 100% { transform: perspective(1400px) rotateX(-5deg) rotateY(6deg) translateY(0px); }
+            50% { transform: perspective(1400px) rotateX(5deg) rotateY(-6deg) translateY(-14px); }
+        }
+        /* 2D Float for flat art styles to prevent 3D transition glitches */
+        @keyframes floatFlat {
+            0%, 100% { transform: perspective(none) rotateX(0deg) rotateY(0deg) translateY(0px); }
+            50% { transform: perspective(none) rotateX(0deg) rotateY(0deg) translateY(-14px); }
+        }
+        @keyframes diagonalSubtleSweep {
+            0%, 100% { transform: translate(-10%, -10%); opacity: 0.05; }
+            50% { transform: translate(6%, 6%); opacity: 0.45; }
+        }
+        @keyframes lensSync {
+            0%, 25%, 75%, 100% { filter: brightness(0.3) drop-shadow(0 0 0px rgba(255,255,255,0.0)); }
+            50% { filter: brightness(2.2) drop-shadow(0 0 5px rgba(255,255,255,0.5)); }
+        }
+        @keyframes rotateAlbum {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .phone-mockup-con {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: var(--size);
+            perspective: 1400px;
+        }
+        .phone {
+            position: relative;
+            z-index: 1;
+            aspect-ratio: 393/852;
+            background: #111;
+            height: var(--height);
+            border-radius: var(--border-radius);
+            box-shadow: 0 0 0.1em 0.2em hsl(284, 20%, 20%), 0 0 0 var(--border-width) hsl(284, 30%, 80%), 0 30px 60px rgba(0,0,0,0.3);
+            box-sizing: border-box;
+            opacity: 0;
+            transform: scale3d(1.05, 1.05, 1);
+            animation: phoneAppear 1s cubic-bezier(.15,0,.333,1) forwards, floatTilt 7s ease-in-out infinite 1s;
+            transform-style: preserve-3d;
+        }
+        .phone::before {
+            content: '';
+            position: absolute;
+            top: var(--border-radius);
+            right: calc(var(--border-width) * -1);
+            bottom: var(--border-radius);
+            left: calc(var(--border-width) * -1);
+            border: 0.4em solid hsl(284, 20%, 25%);
+            border-left-width: 0;
+            border-right-width: 0;
+        }
+
+        .phone-buttons { position: absolute; inset: calc(var(--border-width) * -1); pointer-events: none; }
+        .phone-buttons .left, .phone-buttons .right { position: absolute; width: var(--button-width); display: flex; flex-direction: column; align-items: stretch; gap: 1.5em; }
+        .phone-buttons .left { right: 100%; top: calc(var(--border-radius) * 2); }
+        .phone-buttons .left .button:nth-child(1) { height: 3em; margin-bottom: 0.5em; }
+        .phone-buttons .right { left: 100%; transform: scale3d(-1, 1, 1); top: calc(var(--border-radius) * 3); }
+        .phone-buttons .right .button { height: 9.5em; }
+        .phone-buttons .button {
+            background: hsl(284, 20%, 90%);
+            height: 6em;
+            box-shadow: inset -0.15em 0 0.1em black, inset 0 0 0.1em hsl(284, 30%, 85%), inset 0 0.2em 0.1em hsl(284, 30%, 85%), inset 0 -0.2em 0.1em hsl(284, 30%, 85%), inset -0.1em 0.333em 0.1em rgba(0, 0, 0, 0.5), inset -0.1em -0.333em 0.1em rgba(0, 0, 0, 0.5);
+            border-top-left-radius: 0.2em; border-bottom-left-radius: 0.2em;
+        }
+
+        .screen-container {
+            position: absolute; inset: 0; border-radius: var(--border-radius); border: var(--pad) solid black;
+            display: flex; flex-direction: column; align-items: center; overflow: hidden; transform-style: preserve-3d;
+        }
+        .glass-reflection { position: absolute; inset: 0; z-index: 200; pointer-events: none; overflow: hidden; }
+        .shine-bar {
+            position: absolute; top: -100%; left: -100%; width: 300%; height: 300%;
+            background: linear-gradient(135deg, transparent 40%, rgba(255, 255, 255, 0.03) 46%, rgba(255, 255, 255, 0.18) 50%, rgba(255, 255, 255, 0.03) 54%, transparent 60%);
+            transform: translate(-15%, -15%); animation: diagonalSubtleSweep 7s ease-in-out infinite 1s;
+        }
+        .phone-bg { position: absolute; inset: 0; background: #F3F4F6; border-radius: calc(var(--border-radius) - var(--pad)); overflow: hidden; transform: translateZ(0); }
+        .notch-container { position: absolute; z-index: 210; top: calc(var(--pad) + 0.6em); right: var(--pad); left: var(--pad); display: flex; justify-content: center; height: 100%; max-height: calc(var(--notch-radius) * 2); pointer-events: none; }
+        .notch { position: relative; border-radius: var(--notch-radius); pointer-events: all; color: white; display: flex; width: 100%; max-width: var(--notch-width); max-height: var(--notch-height); background: black; align-items: center; justify-content: space-between; padding: 0 0.8em; box-sizing: border-box; }
+        .notch-content { display: flex; align-items: center; width: 100%; height: 100%; justify-content: flex-start; gap: 0.8em; }
+        .tile { width: 2.1em; height: 2.1em; border-radius: 50%; overflow: hidden; animation: rotateAlbum 8s linear infinite; flex-shrink: 0; box-shadow: 0 0 8px rgba(250,71,132,0.4); }
+        .tile img { width: 100%; height: 100%; object-fit: cover; }
+        .camera { position: absolute; z-index: 85; top: 50%; right: 0.9em; transform: translateY(-50%); width: 1.3em; height: 1.3em; background: #08090d; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: inset 0 0 5px rgba(0,0,0,0.98); pointer-events: none; animation: lensSync 7s ease-in-out infinite 1s; }
+        .camera::before { content: ''; width: 0.7em; height: 0.7em; background: radial-gradient(circle at 35% 35%, #121624 0%, #030407 85%); border-radius: 50%; box-shadow: 0 0 2px rgba(255,255,255,0.1), inset 0 0 2px rgba(255,255,255,0.2); }
+        .screen { display: flex; flex-direction: column; flex-grow: 1; box-sizing: border-box; width: 100%; height: 100%; position: relative; overflow: hidden; z-index: 4; padding: 0; border-radius: calc(var(--border-radius) - var(--pad)); }
+        .screen img { width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0; }
+
+        /* =========================================
+           DYNAMIC ART STYLE THEMES
+           ========================================= */
+
+        /* --- 1. SKETCH THEME --- */
+        body[data-theme="sketch"] {
+            font-family: 'Architects Daughter', cursive !important;
+            background-color: #FDFBF7 !important;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" opacity="0.1"><path d="M0 0 l100 100 M100 0 L0 100" stroke="%23000" stroke-width="0.5"/></svg>') !important;
+            color: #222 !important;
+        }
+        body[data-theme="sketch"] .mesh-bg { display: none !important; }
+        body[data-theme="sketch"] .text-gradient { background: none !important; -webkit-text-fill-color: #222 !important; text-decoration: underline; text-decoration-style: wavy; }
+        body[data-theme="sketch"] .glass-effect, body[data-theme="sketch"] .bg-white, body[data-theme="sketch"] .bg-gray-50, body[data-theme="sketch"] .btn-primary {
+            background: transparent !important; border: 2px solid #222 !important;
+            border-radius: 255px 15px 225px 15px/15px 225px 15px 255px !important;
+            box-shadow: 4px 4px 0px rgba(0,0,0,0.8) !important; color: #222 !important; backdrop-filter: none !important;
+        }
+        body[data-theme="sketch"] .btn-primary * { color: #222 !important; }
+        body[data-theme="sketch"] .phone { 
+            border: 4px solid #222 !important; 
+            border-radius: 255px 15px 225px 15px/15px 225px 15px 255px !important; 
+            background: #FDFBF7 !important; 
+            box-shadow: 15px 15px 0px rgba(0,0,0,0.8) !important;
+        }
+        body[data-theme="sketch"] .phone::before { display: none !important; }
+        body[data-theme="sketch"] .phone-buttons .button { background: #FDFBF7 !important; border: 3px solid #222 !important; box-shadow: none !important; border-radius: 4px !important;}
+        body[data-theme="sketch"] .screen-container { border: var(--pad) solid #222 !important; border-radius: 255px 15px 225px 15px/15px 225px 15px 255px !important; }
+        body[data-theme="sketch"] .phone-bg, body[data-theme="sketch"] .screen { border-radius: 255px 15px 225px 15px/15px 225px 15px 255px !important; }
+        body[data-theme="sketch"] .screen img { filter: grayscale(100%) contrast(150%) brightness(1.1) !important; border-radius: 0 !important; }
+        body[data-theme="sketch"] i[class^="ph"] { filter: drop-shadow(2px 2px 0px rgba(0,0,0,0.8)); transform: rotate(-5deg); color: #222 !important; }
+
+        /* --- 2. PIXEL THEME --- */
+        body[data-theme="pixel"] {
+            font-family: 'VT323', monospace !important; background-color: #000 !important; color: #39ff14 !important; 
+        }
+        body[data-theme="pixel"] .mesh-bg, body[data-theme="pixel"] .sketch-pattern { display: none !important; }
+        body[data-theme="pixel"] * { border-radius: 0 !important; }
+        body[data-theme="pixel"] .text-gradient { background: none !important; -webkit-text-fill-color: #39ff14 !important; text-shadow: 4px 4px 0px #005500 !important; }
+        body[data-theme="pixel"] .glass-effect, body[data-theme="pixel"] .bg-white, body[data-theme="pixel"] .bg-gray-50, body[data-theme="pixel"] .btn-primary {
+            background: #000 !important; border: 4px solid #39ff14 !important; box-shadow: 8px 8px 0px #005500 !important; color: #39ff14 !important; backdrop-filter: none !important;
+        }
+        body[data-theme="pixel"] .btn-primary * { color: #39ff14 !important; }
+        body[data-theme="pixel"] .phone { 
+            border: 6px solid #39ff14 !important; 
+            border-radius: 0 !important; 
+            background: #000 !important; 
+            box-shadow: 20px 20px 0px #005500 !important; 
+        }
+        body[data-theme="pixel"] .phone::before { display: none !important; }
+        body[data-theme="pixel"] .phone-buttons .button { background: #000 !important; border: 3px solid #39ff14 !important; box-shadow: inset -4px 0 0 #005500 !important; border-radius: 0 !important;}
+        body[data-theme="pixel"] .screen-container { border: var(--pad) solid #39ff14 !important; }
+        body[data-theme="pixel"] .screen img { image-rendering: pixelated !important; filter: contrast(200%) grayscale(100%) brightness(0.8) sepia(100%) hue-rotate(80deg) saturate(400%) !important; }
+        body[data-theme="pixel"] i[class^="ph"] { filter: drop-shadow(2px 2px 0px #005500); color: #39ff14 !important; }
+
+        /* --- 3. WATERCOLOR THEME --- */
+        body[data-theme="watercolor"] { 
+            font-family: 'Water Brush', cursive !important; 
+            font-size: 1.35rem !important;
+            color: #3b2840 !important; 
+            background-color: #fcf9f2 !important; 
+            background-image: url('https://www.transparenttextures.com/patterns/watercolor.png') !important;
+        }
+        body[data-theme="watercolor"] h1, 
+        body[data-theme="watercolor"] h2, 
+        body[data-theme="watercolor"] h3,
+        body[data-theme="watercolor"] .font-display {
+            font-size: 1.15em; 
+            text-shadow: 2px 2px 8px rgba(123, 75, 148, 0.2);
+            mix-blend-mode: multiply;
+        }
+        body[data-theme="watercolor"] .text-gradient { background: none !important; -webkit-text-fill-color: #7b4b94 !important; text-shadow: 2px 2px 4px rgba(123, 75, 148, 0.3) !important; }
+        body[data-theme="watercolor"] .glass-effect, body[data-theme="watercolor"] .bg-white, body[data-theme="watercolor"] .bg-gray-50 {
+            background: rgba(255,255,255,0.8) !important; border: none !important;
+            border-radius: 255px 15px 225px 15px/15px 225px 15px 255px !important;
+            box-shadow: inset 0 0 20px rgba(162, 210, 255, 0.5), 10px 10px 30px rgba(250, 71, 132, 0.15) !important; backdrop-filter: blur(4px) !important; color: #5a2e5d !important;
+        }
+        body[data-theme="watercolor"] .btn-primary { background: rgba(162, 210, 255, 0.5) !important; border: none !important; box-shadow: inset 0 0 10px rgba(123, 75, 148, 0.3), 4px 4px 10px rgba(0,0,0,0.1) !important; color: #5a2e5d !important; }
+        body[data-theme="watercolor"] .btn-primary * { color: #5a2e5d !important; }
+        body[data-theme="watercolor"] .phone { 
+            border: 2px solid rgba(123, 75, 148, 0.2) !important; 
+            background: rgba(255,255,255,0.85) !important; 
+            border-radius: 255px 15px 225px 15px/15px 225px 15px 255px !important; 
+            box-shadow: inset 0 0 40px rgba(250, 71, 132, 0.2), 15px 15px 40px rgba(162, 210, 255, 0.4) !important; 
+        }
+        body[data-theme="watercolor"] .phone::before { display: none !important; }
+        body[data-theme="watercolor"] .phone-buttons .button { background: rgba(250, 71, 132, 0.3) !important; box-shadow: inset 2px 2px 6px rgba(255,255,255,0.6) !important; border-radius: 255px 15px 225px 15px/15px 225px 15px 255px !important; }
+        body[data-theme="watercolor"] .screen-container { border: var(--pad) solid rgba(123, 75, 148, 0.5) !important; border-radius: 255px 15px 225px 15px/15px 225px 15px 255px !important; }
+        body[data-theme="watercolor"] .phone-bg, body[data-theme="watercolor"] .screen { border-radius: 255px 15px 225px 15px/15px 225px 15px 255px !important; }
+        body[data-theme="watercolor"] .screen img { filter: saturate(1.3) contrast(1.1) opacity(0.9) !important; mix-blend-mode: multiply; border-radius: 0 !important; }
+        body[data-theme="watercolor"] i[class^="ph"] { color: #FA4784 !important; filter: blur(0.5px); }
+
+        /* --- 4. POP ART THEME (Archie Comics) --- */
+        body[data-theme="popart"] {
+            font-family: 'Bangers', system-ui !important; background-color: #FFE040 !important;
+            background-image: radial-gradient(#FA4784 4px, transparent 4px) !important; background-size: 20px 20px !important; color: #000 !important; text-transform: uppercase;
+        }
+        body[data-theme="popart"] .mesh-bg, body[data-theme="popart"] .sketch-pattern { display: none !important; }
+        body[data-theme="popart"] .text-gradient { background: none !important; -webkit-text-fill-color: #fff !important; text-shadow: 4px 4px 0px #000 !important; -webkit-text-stroke: 1.5px #000 !important; }
+        body[data-theme="popart"] .bg-white, body[data-theme="popart"] .bg-gray-50, body[data-theme="popart"] .glass-effect { 
+            background: #fff !important; border: 4px solid #000 !important; border-radius: 0 !important; box-shadow: 8px 8px 0px #000 !important; color: #000 !important; backdrop-filter: none !important; 
+        }
+        body[data-theme="popart"] .btn-primary { background: #00FFFF !important; border: 4px solid #000 !important; border-radius: 0 !important; box-shadow: 6px 6px 0px #000 !important; color: #000 !important; text-shadow: 2px 2px 0px #fff !important; }
+        body[data-theme="popart"] .btn-primary * { color: #000 !important; }
+        body[data-theme="popart"] .phone { 
+            border: 8px solid #000 !important; 
+            border-radius: 0 !important; 
+            background: #FA4784 !important; 
+            box-shadow: 20px 20px 0px #00FFFF !important; 
+        }
+        body[data-theme="popart"] .phone::before { display: none !important; }
+        body[data-theme="popart"] .phone-buttons .button { background: #00FFFF !important; border: 4px solid #000 !important; box-shadow: inset -4px -4px 0px rgba(0,0,0,0.5) !important; border-radius: 0 !important; }
+        body[data-theme="popart"] .screen-container { border: var(--pad) solid #000 !important; border-radius: 0 !important;}
+        body[data-theme="popart"] .phone-bg, body[data-theme="popart"] .screen { border-radius: 0 !important; }
+        body[data-theme="popart"] .screen img { filter: contrast(150%) saturate(200%) sepia(100%) hue-rotate(-50deg) !important; border-radius: 0 !important;}
+        body[data-theme="popart"] i[class^="ph"] { filter: drop-shadow(3px 3px 0px #000); color: #FA4784 !important; }
+
+        /* --- 5. OIL PAINTING THEME --- */
+        body[data-theme="oilpainting"] {
+            font-family: 'Finger Paint', cursive !important;
+            background-color: #1a1512 !important;
+            background-image: url('https://www.transparenttextures.com/patterns/canvas.png') !important; 
+            color: #e0d0b0 !important;
+        }
+        body[data-theme="oilpainting"] h1, 
+        body[data-theme="oilpainting"] h2, 
+        body[data-theme="oilpainting"] h3,
+        body[data-theme="oilpainting"] .font-display {
+            text-shadow: 3px 3px 5px rgba(0,0,0,0.9), 1px 1px 0px rgba(255,255,255,0.2) !important;
+        }
+        body[data-theme="oilpainting"] .mesh-bg, body[data-theme="oilpainting"] .sketch-pattern { display: none !important; }
+        body[data-theme="oilpainting"] .text-gradient { background: none !important; -webkit-text-fill-color: #d2a679 !important; text-shadow: 1px 1px 0px rgba(255,255,255,0.2), -2px -2px 0px rgba(0,0,0,0.8) !important; }
+        body[data-theme="oilpainting"] .glass-effect, body[data-theme="oilpainting"] .bg-white, body[data-theme="oilpainting"] .bg-gray-50 {
+            background: #4a3018 !important; border: 4px outset #5c4033 !important; border-radius: 2px !important; box-shadow: 10px 10px 20px rgba(0,0,0,0.9), inset 2px 2px 5px rgba(255,255,255,0.1) !important; color: #f4e8d3 !important; backdrop-filter: none !important;
+        }
+        body[data-theme="oilpainting"] .btn-primary { background: #8b5a2b !important; border: 4px outset #a67c52 !important; border-radius: 2px !important; box-shadow: 5px 5px 15px rgba(0,0,0,0.8) !important; color: #f4e8d3 !important; }
+        body[data-theme="oilpainting"] .btn-primary * { color: #f4e8d3 !important; }
+        body[data-theme="oilpainting"] .phone { 
+            border: 18px ridge #b8860b !important; 
+            border-radius: 2px !important; 
+            background: #2b2b2b !important; 
+            box-shadow: 25px 25px 40px rgba(0,0,0,0.95), inset 10px 10px 20px rgba(0,0,0,0.8) !important; 
+        }
+        body[data-theme="oilpainting"] .phone::before { display: none !important; }
+        body[data-theme="oilpainting"] .phone-buttons .button { background: #5c4033 !important; border: 4px outset #8b5a2b !important; box-shadow: 4px 4px 10px rgba(0,0,0,0.8) !important; border-radius: 2px !important; }
+        body[data-theme="oilpainting"] .screen-container { border: var(--pad) solid #5c4033 !important; border-radius: 2px !important; }
+        body[data-theme="oilpainting"] .phone-bg, body[data-theme="oilpainting"] .screen { border-radius: 2px !important; }
+        body[data-theme="oilpainting"] .screen img { filter: saturate(1.4) contrast(1.2) brightness(0.9) sepia(0.2) !important; border-radius: 0 !important; }
+        body[data-theme="oilpainting"] i[class^="ph"] { filter: drop-shadow(4px 4px 2px #000); color: #d2a679 !important; }
+
+        /* --- 6. COMIC THEME (Action/Superhero) --- */
+        body[data-theme="comic"] {
+            font-family: 'Comic Neue', cursive, sans-serif !important; background-color: #E23D28 !important;
+            background-image: repeating-linear-gradient(45deg, transparent, transparent 20px, rgba(255,255,255,0.05) 20px, rgba(255,255,255,0.05) 40px) !important; color: #111 !important;
+        }
+        body[data-theme="comic"] .mesh-bg, body[data-theme="comic"] .sketch-pattern { display: none !important; }
+        
+        body[data-theme="comic"] h1, body[data-theme="comic"] h2, body[data-theme="comic"] h3 {
+            font-family: 'Bangers', system-ui !important; text-transform: uppercase; letter-spacing: 2px;
+            color: #FFF !important; 
+            -webkit-text-fill-color: #FFF !important; 
+            -webkit-text-stroke: 2px #000;
+            text-shadow: 6px 6px 0 #000 !important;
+        }
+        
+        body[data-theme="comic"] .text-gradient { 
+            background: none !important; 
+            -webkit-text-fill-color: #FFF !important; 
+            -webkit-text-stroke: 2.5px #000 !important; 
+            text-shadow: 6px 6px 0 #FFC107 !important; 
+        }
+
+        body[data-theme="comic"] p.text-lg {
+            background: #FFF !important;
+            color: #000 !important;
+            border: 3px solid #000 !important;
+            box-shadow: 6px 6px 0px #000 !important;
+            padding: 1.5rem !important;
+            border-radius: 4px !important;
+            font-weight: 800 !important;
+        }
+
+        body[data-theme="comic"] .glass-effect, body[data-theme="comic"] .bg-white, body[data-theme="comic"] .bg-gray-50 {
+            background: #FFF !important; border: 3px solid #000 !important; border-radius: 2px !important; box-shadow: 8px 8px 0px #000 !important; color: #000 !important; -webkit-text-fill-color: #000 !important; backdrop-filter: none !important; transform: skewX(-2deg);
+        }
+        body[data-theme="comic"] .btn-primary {
+            background: #FFC107 !important; border: 3px solid #000 !important; border-radius: 2px !important; box-shadow: 6px 6px 0px #000 !important; color: #000 !important; text-transform: uppercase; font-family: 'Bangers', system-ui !important; letter-spacing: 1px; font-size: 1.2rem; -webkit-text-fill-color: #000 !important; -webkit-text-stroke: 0px !important; text-shadow: none !important;
+        }
+        body[data-theme="comic"] .btn-primary * { color: #000 !important; }
+        
+        body[data-theme="comic"] .phone {
+            border: 5px solid #000 !important; 
+            background: #fff !important; 
+            box-shadow: 20px 20px 0px #000 !important; 
+            transform: scale3d(1.05, 1.05, 1) rotate(-2deg) !important;
+            border-radius: 0 !important;
+        }
+        body[data-theme="comic"] .phone::before { display: none !important; }
+        body[data-theme="comic"] .phone-buttons .button { background: #E23D28 !important; border: 3px solid #000 !important; box-shadow: inset -3px -3px 0 rgba(0,0,0,0.5) !important; border-radius: 0 !important; }
+        body[data-theme="comic"] .screen-container { border: var(--pad) solid #000 !important; border-radius: 0 !important; }
+        body[data-theme="comic"] .phone-bg, body[data-theme="comic"] .screen { border-radius: 0 !important; }
+        body[data-theme="comic"] .screen img { filter: contrast(130%) saturate(150%) !important; border-radius: 0 !important; }
+        body[data-theme="comic"] i[class^="ph"] { filter: drop-shadow(2px 2px 0px #000); color: #E23D28 !important; }
+
+        /* --- Fade Transition Overlay --- */
+        .fade-overlay {
+            position: fixed; inset: 0; z-index: 9999; pointer-events: none; opacity: 0;
+            background: #FDFBF7; 
+            transition: opacity 0.6s ease-in-out;
+        }
+        .fade-active {
+            opacity: 1;
+        }
+
+    </style>
+</head>
+
+<body class="antialiased font-sans">
+    
+    <!-- Museum Frame Overlay for Oil Theme -->
+    <div class="museum-frame"></div>
+
+    <!-- Fade Overlay Layer for smooth theme transition -->
+    <div class="fade-overlay"></div>
+
+    <!-- Theme Picker (Manual Selection) -->
+    <div class="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-[100] glass-effect rounded-full p-2 flex gap-2 shadow-2xl overflow-x-auto max-w-[95vw] border border-gray-200 items-center">
+        <button onclick="setTheme('')" class="px-4 py-2 rounded-full text-sm font-black transition-transform hover:scale-105 bg-gray-100 text-gray-800 shrink-0 border border-gray-300">Default</button>
+        <button onclick="setTheme('sketch')" class="px-4 py-2 rounded-full text-sm font-black transition-transform hover:scale-105 bg-white border border-gray-400 text-gray-800 shrink-0">Sketch</button>
+        <button onclick="setTheme('pixel')" class="px-4 py-2 rounded-full text-sm font-black transition-transform hover:scale-105 bg-black text-[#39ff14] shrink-0 border border-[#39ff14]">Pixel</button>
+        <button onclick="setTheme('watercolor')" class="px-4 py-2 rounded-full text-sm font-black transition-transform hover:scale-105 bg-pink-100 text-[#5a2e5d] shrink-0 border border-pink-300">Watercolor</button>
+        <button onclick="setTheme('popart')" class="px-4 py-2 rounded-full text-sm font-black transition-transform hover:scale-105 bg-[#FFE040] text-black border border-black shrink-0">Pop Art</button>
+        <button onclick="setTheme('comic')" class="px-4 py-2 rounded-full text-sm font-black transition-transform hover:scale-105 bg-[#E23D28] text-white border border-black shrink-0">Comic</button>
+        <button onclick="setTheme('oilpainting')" class="px-4 py-2 rounded-full text-sm font-black transition-transform hover:scale-105 bg-[#5c4033] text-[#f4e8d3] shrink-0 border border-[#b8860b]">Oil</button>
+    </div>
+
+    <nav class="fixed w-full z-50 glass-effect transition-all duration-300 rounded-b-3xl" id="navbar">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-20">
+                <!-- Logo -->
+                <div class="flex-shrink-0 flex items-center gap-3 cursor-pointer">
+                    <img src="logo.png" alt="bRUSH Logo" class="w-10 h-10 rounded-xl object-cover shadow-[0_4px_10px_rgba(250,71,132,0.3)]" onerror="this.outerHTML='<div class=\'w-10 h-10 rounded-xl bg-gradient-to-br from-brush-orange to-brush-pink flex items-center justify-center text-white shadow-[0_4px_10px_rgba(250,71,132,0.3)]\'><i class=\'ph-fill ph-paint-brush-broad text-2xl\'></i></div>'">
+                    <span class="font-display font-black text-2xl tracking-tight mt-1">bRUSH</span>
+                </div>
+                
+                <!-- Desktop Menu -->
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-8">
+                        <a href="#how-it-works" class="font-semibold hover:opacity-70 transition-opacity">Features</a>
+                        <a href="#privacy" class="font-semibold hover:opacity-70 transition-opacity">Data Policy</a>
+                    </div>
+                </div>
+
+                <div class="hidden md:block">
+                    <button class="btn-primary px-6 py-2.5 font-bold text-sm flex items-center gap-2">
+                        <span>Download</span> <i class="ph-bold ph-apple-logo text-lg"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="relative z-10 pt-32 pb-20">
+        <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 lg:pt-16">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+                
+                <!-- Hero Text -->
+                <div class="order-2 lg:order-1 lg:col-span-6 text-center lg:text-left relative z-10">
+                    <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-effect font-bold text-sm mb-6 border border-brush-pink/20">
+                        <i class="ph-bold ph-timer"></i> <span>15 Minutes. 1 Prompt.</span>
+                    </div>
+                    
+                    <h1 class="text-5xl md:text-6xl lg:text-7xl font-display font-black tracking-tight mb-6 leading-[1.1]">
+                        The Daily <br />
+                        <span class="text-gradient">Drawing Challenge.</span>
+                    </h1>
+                    
+                    <p class="mt-4 text-lg md:text-xl opacity-80 font-medium max-w-lg mx-auto lg:mx-0 mb-10 leading-relaxed">
+                        Every day, a new prompt drops. You have 15 minutes to sketch your masterpiece. Award medals, build detailed avatars, and generate animated share cards to show off your streak.
+                    </p>
+                    
+                    <div class="flex flex-col sm:flex-row justify-center lg:justify-start gap-4">
+                        <button class="btn-primary px-8 py-4 text-lg font-bold flex items-center justify-center gap-2">
+                            <span>Get bRUSH</span> <i class="ph-bold ph-apple-logo text-xl"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Hero Phone Mockup -->
+                <div class="order-1 lg:order-2 lg:col-span-6 flex justify-center relative w-full h-[650px] lg:h-[750px] items-center">
+                    
+                    <div class="phone-mockup-con">
+                        <div class="phone">
+                            <div class="phone-buttons">
+                                <div class="left">
+                                    <div class="button"></div>
+                                    <div class="button"></div>
+                                    <div class="button"></div>
+                                </div>
+                                <div class="right">
+                                    <div class="button"></div>
+                                </div>
+                            </div>
+                            <div class="screen-container">
+                                <div class="phone-bg"></div>
+                                
+                                <!-- Dynamic Island -->
+                                <div class="notch-container">
+                                    <div class="notch">
+                                        <div class="notch-content">
+                                            <!-- Rotating Music Tile -->
+                                            <div class="tile">
+                                                <img src="music.jpg" alt="Music Cover" onerror="this.src='https://placehold.co/100x100/1E2E4C/FF9E3D?text=♫'" />
+                                            </div>
+                                        </div>
+                                        <div class="camera"></div>
+                                    </div>
+                                </div>
+
+                                <!-- Screen Content -->
+                                <div class="screen">
+                                    <img src="app_screenshot.png" alt="bRUSH App Interface" onerror="this.src='https://placehold.co/800x1728/FDFBF7/FF9E3D?text=bRUSH+Screenshot';">
+                                </div>
+
+                                <!-- Glass Reflection overlay for 3D effect -->
+                                <div class="glass-reflection">
+                                    <div class="shine-bar"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="how-it-works" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 relative">
+            <div class="text-center mb-16 relative z-10">
+                <h2 class="text-4xl md:text-5xl font-display font-black mb-4 tracking-tight">The <span class="text-gradient">bRUSH</span> Mechanics</h2>
+                <p class="text-lg opacity-70 max-w-2xl mx-auto font-medium">Built to challenge your creativity, reward consistency, and show off your unique style.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="bg-white p-8 rounded-3xl shadow-[4px_4px_0px_#1E2E4C] border-2 border-brush-textBlue transform transition-transform hover:-translate-y-1">
+                    <div class="w-14 h-14 rounded-2xl bg-orange-100 flex items-center justify-center mb-6 border border-orange-200">
+                        <i class="ph-bold ph-timer text-3xl text-brush-orange"></i>
+                    </div>
+                    <h3 class="text-2xl font-black mb-3 font-display">15 Minutes. 1 Prompt.</h3>
+                    <p class="text-base font-medium opacity-80 leading-relaxed">
+                        Every day drops a single, unique prompt. Once you tap "Draw," the 15-minute timer starts. Choose from custom backgrounds (notebook, chalkboard, canvas) and sketch your masterpiece. Cancel, and you lose your chance for the day.
+                    </p>
+                </div>
+                
+                <div class="bg-white p-8 rounded-3xl shadow-[4px_4px_0px_#1E2E4C] border-2 border-brush-textBlue transform transition-transform hover:-translate-y-1">
+                    <div class="w-14 h-14 rounded-2xl bg-yellow-100 flex items-center justify-center mb-6 border border-yellow-200">
+                        <i class="ph-bold ph-medal text-3xl text-yellow-600"></i>
+                    </div>
+                    <h3 class="text-2xl font-black mb-3 font-display">Medals & Leaderboards</h3>
+                    <p class="text-base font-medium opacity-80 leading-relaxed">
+                        Add friends and review their daily sketches. Award your limited Gold (100 pts), Silver (25 pts), and Bronze (10 pts) medals carefully. Every medal counts towards your weekly points to climb the competitive podium.
+                    </p>
+                </div>
+
+                <div class="bg-white p-8 rounded-3xl shadow-[4px_4px_0px_#1E2E4C] border-2 border-brush-textBlue transform transition-transform hover:-translate-y-1">
+                    <div class="w-14 h-14 rounded-2xl bg-purple-100 flex items-center justify-center mb-6 border border-purple-200">
+                        <i class="ph-bold ph-smiley text-3xl text-purple-600"></i>
+                    </div>
+                    <h3 class="text-2xl font-black mb-3 font-display">Expressive Avatars</h3>
+                    <p class="text-base font-medium opacity-80 leading-relaxed">
+                        Dive into the Avatar Studio to build your digital self. Mix and match bodies, shirts, eyes, hair, and backgrounds. Feeling weird? Switch to "Fun" mode for alien and creature customizations.
+                    </p>
+                </div>
+
+                <div class="bg-white p-8 rounded-3xl shadow-[4px_4px_0px_#1E2E4C] border-2 border-brush-textBlue transform transition-transform hover:-translate-y-1">
+                    <div class="w-14 h-14 rounded-2xl bg-pink-100 flex items-center justify-center mb-6 border border-pink-200">
+                        <i class="ph-bold ph-video-camera text-3xl text-brush-pink"></i>
+                    </div>
+                    <h3 class="text-2xl font-black mb-3 font-display">Animated Share Cards</h3>
+                    <p class="text-base font-medium opacity-80 leading-relaxed">
+                        Show off your creative consistency. bRUSH generates beautiful, animated video export cards highlighting your current streak, total drawings, earned medals, or your favorite showcase piece for social media.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <section id="privacy" class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-20 mb-10">
+            <div class="bg-white rounded-3xl p-8 md:p-12 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 relative overflow-hidden">
+                <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-brush-orange to-brush-pink"></div>
+                
+                <h2 class="text-3xl md:text-4xl font-display font-black mb-6">Your Art. Your Data.</h2>
+                <p class="opacity-80 mb-8 font-medium text-lg">We believe your creativity belongs to you. Here is exactly how we handle your data in bRUSH:</p>
+                
+                <div class="space-y-6">
+                    <div class="p-6 bg-gray-50 rounded-2xl border border-gray-200">
+                        <h4 class="font-bold text-xl mb-3 flex items-center gap-2"><i class="ph-fill ph-user-circle text-brush-textBlue"></i> Profile & Authentication</h4>
+                        <p class="text-base leading-relaxed">We use Firebase Authentication to securely store your login credentials. Your custom username, streak count, and detailed Avatar configurations (body, shirt, face, etc.) are stored in Firestore so your friends can see your digital identity.</p>
+                    </div>
+
+                    <div class="p-6 bg-gray-50 rounded-2xl border border-gray-200">
+                        <h4 class="font-bold text-xl mb-3 flex items-center gap-2"><i class="ph-fill ph-users-three text-purple-500"></i> Social & Leaderboard Data</h4>
+                        <p class="text-base leading-relaxed">bRUSH tracks your friend connections and the Gold, Silver, and Bronze medals you award and receive. This data is strictly used to calculate your weekly points and populate the competitive leaderboard.</p>
+                    </div>
+
+                    <div class="p-6 bg-gray-50 rounded-2xl border border-gray-200">
+                        <h4 class="font-bold text-xl mb-3 flex items-center gap-2"><i class="ph-fill ph-cloud-slash text-brush-pink"></i> Cloud Storage Limits</h4>
+                        <p class="text-base leading-relaxed">To protect your privacy and manage resources, <strong>cloud drawings stored on Firebase Storage are securely deleted every month</strong>. Your artwork remains safely stored on your local device permanently.</p>
+                    </div>
+
+                    <div class="p-6 bg-gray-50 rounded-2xl border border-gray-200">
+                        <h4 class="font-bold text-xl mb-3 flex items-center gap-2"><i class="ph-fill ph-shield-check text-brush-orange"></i> Firebase Service Data</h4>
+                        <p class="text-base leading-relaxed mb-4">Firebase Service Data is personal information that Google collects and generates during the provision and administration of the Firebase services, excluding Customer Data and Google Cloud Service Data. Google uses Firebase Service Data in accordance with our privacy policy and applicable terms.</p>
+                        
+                        <div class="bg-white p-4 rounded-xl border border-gray-200 text-sm">
+                            <strong class="block mb-2">Control your data:</strong>
+                            <p>You have control over how Google uses your Firebase Service Data. If you disable the option for Google to use this data for in-depth analysis of non-Firebase services, Firebase Service Data will still be used to make recommendations about and improve Firebase services, and to deliver and improve other services you request.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-white border-t border-gray-200 py-12 relative z-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-6">
+            <div class="flex items-center gap-2">
+                <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-brush-orange to-brush-pink flex items-center justify-center text-white">
+                    <i class="ph-fill ph-paint-brush-broad text-lg"></i>
+                </div>
+                <span class="font-display font-black text-xl tracking-tight">bRUSH</span>
+            </div>
+            
+            <div class="text-sm font-bold opacity-50">
+                &copy; 2026 bRUSH App. Sketch daily.
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Navbar blur effect
+            const navbar = document.getElementById('navbar');
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 20) {
+                    navbar.style.background = 'rgba(255, 255, 255, 0.85)';
+                } else {
+                    navbar.style.background = 'rgba(255, 255, 255, 0.7)';
+                }
+            });
+
+            // Theme Transition Logic - Manual Selection
+            const overlay = document.querySelector('.fade-overlay');
+            const body = document.body;
+            let isTransitioning = false;
+
+            window.setTheme = async function(themeName) {
+                // Prevent clicking while a transition is already happening
+                if (isTransitioning) return;
+                
+                // Prevent reloading the same theme
+                const currentTheme = body.getAttribute('data-theme') || '';
+                if (currentTheme === themeName) return;
+
+                isTransitioning = true;
+
+                // Fade out to blank canvas
+                overlay.classList.add('fade-active');
+                
+                // Wait for the fade CSS transition (600ms)
+                await new Promise(r => setTimeout(r, 600));
+
+                // Swap the DOM entirely into the new Art Style
+                if (themeName === '') {
+                    body.removeAttribute('data-theme');
+                } else {
+                    body.setAttribute('data-theme', themeName);
+                }
+                
+                // Fade back in to reveal the new art style
+                overlay.classList.remove('fade-active');
+
+                // Wait for fade in to finish before allowing another transition
+                await new Promise(r => setTimeout(r, 600));
+                isTransitioning = false;
+            };
+        });
+    </script>
+</body>
+</html>
