@@ -442,18 +442,7 @@
     <!-- Fade Overlay Layer for smooth theme transition -->
     <div class="fade-overlay"></div>
 
-    <!-- Theme Picker (Manual Selection) -->
-    <div class="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-[100] glass-effect rounded-full p-2 flex gap-2 shadow-2xl overflow-x-auto max-w-[95vw] border border-gray-200 items-center">
-        <button onclick="setTheme('')" class="px-4 py-2 rounded-full text-sm font-black transition-transform hover:scale-105 bg-gray-100 text-gray-800 shrink-0 border border-gray-300">Default</button>
-        <button onclick="setTheme('sketch')" class="px-4 py-2 rounded-full text-sm font-black transition-transform hover:scale-105 bg-white border border-gray-400 text-gray-800 shrink-0">Sketch</button>
-        <button onclick="setTheme('pixel')" class="px-4 py-2 rounded-full text-sm font-black transition-transform hover:scale-105 bg-black text-[#39ff14] shrink-0 border border-[#39ff14]">Pixel</button>
-        <button onclick="setTheme('watercolor')" class="px-4 py-2 rounded-full text-sm font-black transition-transform hover:scale-105 bg-pink-100 text-[#5a2e5d] shrink-0 border border-pink-300">Watercolor</button>
-        <button onclick="setTheme('popart')" class="px-4 py-2 rounded-full text-sm font-black transition-transform hover:scale-105 bg-[#FFE040] text-black border border-black shrink-0">Pop Art</button>
-        <button onclick="setTheme('comic')" class="px-4 py-2 rounded-full text-sm font-black transition-transform hover:scale-105 bg-[#E23D28] text-white border border-black shrink-0">Comic</button>
-        <button onclick="setTheme('oilpainting')" class="px-4 py-2 rounded-full text-sm font-black transition-transform hover:scale-105 bg-[#5c4033] text-[#f4e8d3] shrink-0 border border-[#b8860b]">Oil</button>
-    </div>
-
-    <nav class="fixed w-full z-50 transition-all duration-300 rounded-b-3xl" id="navbar">
+    <nav class="fixed w-full z-50 glass-effect transition-all duration-300 rounded-b-3xl shadow-sm" id="navbar">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-20">
                 <!-- Logo -->
@@ -611,32 +600,30 @@
                 
                 <div class="space-y-6">
                     <div class="p-6 bg-gray-50 rounded-2xl border border-gray-200">
-                        <h4 class="font-bold text-xl mb-3 flex items-center gap-2"><i class="ph-fill ph-user-circle text-brush-textBlue"></i> Profile & Authentication</h4>
-                        <p class="text-base leading-relaxed">We use Firebase Authentication to securely store your login credentials. Your custom username, streak count, and detailed Avatar configurations (body, shirt, face, etc.) are stored in Firestore so your friends can see your digital identity.</p>
-                    </div>
-
-                    <div class="p-6 bg-gray-50 rounded-2xl border border-gray-200">
-                        <h4 class="font-bold text-xl mb-3 flex items-center gap-2"><i class="ph-fill ph-users-three text-purple-500"></i> Social & Leaderboard Data</h4>
-                        <p class="text-base leading-relaxed">bRUSH tracks your friend connections and the Gold, Silver, and Bronze medals you award and receive. This data is strictly used to calculate your weekly points and populate the competitive leaderboard.</p>
-                    </div>
-
-                    <div class="p-6 bg-gray-50 rounded-2xl border border-gray-200">
-                        <h4 class="font-bold text-xl mb-3 flex items-center gap-2"><i class="ph-fill ph-cloud-slash text-brush-pink"></i> Cloud Storage Limits</h4>
-                        <p class="text-base leading-relaxed">To protect your privacy and manage resources, <strong>cloud drawings stored on Firebase Storage are securely deleted every month</strong>. Your artwork remains safely stored on your local device permanently.</p>
-                    </div>
-
-                    <div class="p-6 bg-gray-50 rounded-2xl border border-gray-200">
-                        <h4 class="font-bold text-xl mb-3 flex items-center gap-2"><i class="ph-fill ph-shield-check text-brush-orange"></i> Firebase Service Data</h4>
-                        <p class="text-base leading-relaxed mb-4">Firebase Service Data is personal information that Google collects and generates during the provision and administration of the Firebase services, excluding Customer Data and Google Cloud Service Data. Google uses Firebase Service Data in accordance with our privacy policy and applicable terms.</p>
+                        <h4 class="font-bold text-xl mb-3 flex items-center gap-2 text-brush-textBlue"><i class="ph-fill ph-shield-check text-brush-orange"></i> Firebase Service Data</h4>
+                        <p class="text-base text-gray-600 leading-relaxed mb-4">Firebase Service Data is personal information that Google collects and generates during the provision and administration of the Firebase services. Google uses Firebase Service Data in accordance with our privacy policy and applicable terms.</p>
                         
-                        <div class="bg-white p-4 rounded-xl border border-gray-200 text-sm">
-                            <strong class="block mb-2">Control your data:</strong>
+                        <div class="bg-white p-4 rounded-xl border border-gray-200 text-sm text-gray-600">
+                            <strong class="text-gray-800 block mb-2">Control your data:</strong>
                             <p>You have control over how Google uses your Firebase Service Data. If you disable the option for Google to use this data for in-depth analysis of non-Firebase services, Firebase Service Data will still be used to make recommendations about and improve Firebase services, and to deliver and improve other services you request.</p>
                         </div>
                     </div>
                 </div>
             </div>
         </section>
+
+        <!-- Theme Picker (Manual Selection) -->
+        <div class="sticky bottom-6 w-full flex justify-center z-[100] pointer-events-none">
+            <div class="pointer-events-auto glass-effect rounded-full p-2 flex gap-2 shadow-2xl overflow-x-auto max-w-[95vw] border border-gray-200 items-center">
+                <button onclick="setTheme('')" class="px-4 py-2 rounded-full text-sm font-black transition-transform hover:scale-105 bg-gray-100 text-gray-800 shrink-0 border border-gray-300">Default</button>
+                <button onclick="setTheme('sketch')" class="px-4 py-2 rounded-full text-sm font-black transition-transform hover:scale-105 bg-white border border-gray-400 text-gray-800 shrink-0">Sketch</button>
+                <button onclick="setTheme('pixel')" class="px-4 py-2 rounded-full text-sm font-black transition-transform hover:scale-105 bg-black text-[#39ff14] shrink-0 border border-[#39ff14]">Pixel</button>
+                <button onclick="setTheme('watercolor')" class="px-4 py-2 rounded-full text-sm font-black transition-transform hover:scale-105 bg-pink-100 text-[#5a2e5d] shrink-0 border border-pink-300">Watercolor</button>
+                <button onclick="setTheme('popart')" class="px-4 py-2 rounded-full text-sm font-black transition-transform hover:scale-105 bg-[#FFE040] text-black border border-black shrink-0">Pop Art</button>
+                <button onclick="setTheme('comic')" class="px-4 py-2 rounded-full text-sm font-black transition-transform hover:scale-105 bg-[#E23D28] text-white border border-black shrink-0">Comic</button>
+                <button onclick="setTheme('oilpainting')" class="px-4 py-2 rounded-full text-sm font-black transition-transform hover:scale-105 bg-[#5c4033] text-[#f4e8d3] shrink-0 border border-[#b8860b]">Oil</button>
+            </div>
+        </div>
 
     </main>
 
@@ -647,10 +634,11 @@
                 <span class="font-display font-black text-xl text-brush-textBlue tracking-tight">bRUSH</span>
             </div>
             
-            <div class="text-sm font-bold text-gray-400">
-            
-            <div class="text-sm font-bold opacity-50">
-                &copy; 2026 bRUSH App. Sketch daily.
+            <div class="flex flex-col sm:flex-row items-center gap-4 sm:gap-8 text-sm font-bold text-gray-500">
+                <a href="mailto:brushsupport@gmail.com?subject=bRUSH%20App%20Support" class="hover:text-brush-pink transition-colors flex items-center gap-1.5">
+                    <i class="ph-fill ph-envelope-simple text-lg"></i> Support
+                </a>
+                <span class="opacity-50">&copy; 2026 bRUSH App. Sketch daily.</span>
             </div>
         </div>
     </footer>
